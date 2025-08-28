@@ -87,12 +87,12 @@ CREATE TABLE IF NOT EXISTS post_like (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) COMMENT '게시글 좋아요 테이블';
 
--- 북마크 테이블
+-- 북마크 테이블 (두 버전 통합: AUTO_INCREMENT ID 포함하되 UNIQUE 제약 유지)
 CREATE TABLE IF NOT EXISTS post_bookmark (
+    bookmark_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '북마크 ID',
     post_id INT NOT NULL COMMENT '게시글 ID',
     user_id INT NOT NULL COMMENT '사용자 ID',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '북마크 날짜',
-    PRIMARY KEY (post_id, user_id),
     FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_post (user_id, post_id)
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS notice (
     INDEX idx_is_pinned (is_pinned)
 ) COMMENT '공지사항 테이블';
 
--- 작업 지시서 테이블
+-- 작업 지시서 테이블 (통합된 PRIMARY KEY)
 CREATE TABLE IF NOT EXISTS work_order (
     line_id INT NOT NULL COMMENT '라인 ID',
     product_id INT NOT NULL COMMENT '제품 ID',
@@ -177,21 +177,46 @@ CREATE TABLE IF NOT EXISTS machine_state (
     INDEX idx_state (state)
 ) COMMENT '기계 상태 테이블';
 
--- 스케줄 테이블
+-- 스케줄 테이블 (확장된 버전 - Schedule 브랜치의 기능 포함)
 CREATE TABLE IF NOT EXISTS schedule (
     schedule_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '스케줄 ID',
     user_id INT NOT NULL COMMENT '담당자 ID',
     title VARCHAR(200) NOT NULL COMMENT '제목',
     description TEXT COMMENT '설명',
+    type ENUM('meeting', 'task', 'review', 'training', 'milestone') NOT NULL DEFAULT 'meeting' COMMENT '일정 타입',
     start_datetime DATETIME NOT NULL COMMENT '시작일시',
     end_datetime DATETIME NOT NULL COMMENT '종료일시',
+    location VARCHAR(200) COMMENT '장소',
+    status ENUM('planned', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'planned' COMMENT '일정 상태',
+    is_urgent BOOLEAN NOT NULL DEFAULT FALSE COMMENT '긴급 여부',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE COMMENT '활성 상태',
     google_calendar_id VARCHAR(255) COMMENT '구글 캘린더 ID',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    INDEX idx_user_start_date (user_id, start_datetime),
     INDEX idx_start_datetime (start_datetime),
-    INDEX idx_user_datetime (user_id, start_datetime)
-) COMMENT '스케줄 테이블';
+    INDEX idx_type (type),
+    INDEX idx_status (status)
+) COMMENT '일정 테이블';
+
+-- 할일 테이블 (Schedule 브랜치에서 추가)
+CREATE TABLE IF NOT EXISTS task (
+    task_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '할일 ID',
+    user_id INT NOT NULL COMMENT '사용자 ID',
+    title VARCHAR(200) NOT NULL COMMENT '제목',
+    description TEXT COMMENT '설명',
+    priority ENUM('low', 'medium', 'high', 'urgent') NOT NULL DEFAULT 'medium' COMMENT '우선순위',
+    status ENUM('pending', 'in_progress', 'completed') NOT NULL DEFAULT 'pending' COMMENT '상태',
+    due_date DATETIME COMMENT '마감일',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE COMMENT '활성 상태',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    INDEX idx_user_due_date (user_id, due_date),
+    INDEX idx_status (status),
+    INDEX idx_priority (priority)
+) COMMENT '할일 테이블';
 
 -- 날씨 테이블
 CREATE TABLE IF NOT EXISTS weather (
@@ -221,70 +246,7 @@ CREATE TABLE IF NOT EXISTS monitoring_factory (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '업데이트 시간'
 ) COMMENT '공장 모니터링 상태 테이블';
 
--- 샘플 데이터 삽입
-
+-- 샘플 데이터 삽입 (관리자 계정만)
 -- 관리자 계정 (비밀번호: admin123)
-INSERT INTO users (username, email, password, role, department, is_active) VALUES
-('admin', 'admin@mes.com', '$2a$10$9tgX3CnemVwFZ.VuBfBMq.pFdule/.1K3tdgS5p6S5m.6nu9PKq/C', 'ADMIN', 'IT', true),
-('manager1', 'manager1@mes.com', '$2a$10$9tgX3CnemVwFZ.VuBfBMq.pFdule/.1K3tdgS5p6S5m.6nu9PKq/C', 'MANAGER', '생산관리', true),
-('operator1', 'operator1@mes.com', '$2a$10$9tgX3CnemVwFZ.VuBfBMq.pFdule/.1K3tdgS5p6S5m.6nu9PKq/C', 'OPERATOR', '생산', true);
-
--- 제품 데이터
-INSERT INTO product (name) VALUES
-('제품A'), ('제품B'), ('제품C');
-
--- 기계 데이터
-INSERT INTO machine (machine_name, location, line_id, product_id, duration) VALUES
-('기계-001', '라인1', 1, 1, 480),
-('기계-002', '라인1', 1, 1, 480),
-('기계-003', '라인2', 2, 2, 480);
-
--- 공지사항 샘플
-INSERT INTO notice (user_id, title, content, is_pinned) VALUES
-(1, '시스템 점검 안내', 'MES 시스템 정기 점검이 예정되어 있습니다.', true),
-(2, '생산 목표 달성 축하', '이번 달 생산 목표를 달성했습니다.', false);
-
--- 작업 지시서 샘플
-INSERT INTO work_order (line_id, product_id, work_order_id, user_id, qty_plan) VALUES
-(1, 1, 'WO-2025-001', 2, 1000),
-(2, 2, 'WO-2025-002', 2, 500);
-
--- 날씨 데이터 샘플
-INSERT INTO weather (location, temperature_c, humidity, recorded_at) VALUES
-('공장A', 23.5, 65.0, NOW()),
-('공장B', 24.2, 68.5, NOW());
-
--- 공장 온도 데이터 샘플
-INSERT INTO factory_temperature (factory_name, internal_temperature, recorded_at) VALUES
-('1공장', 22.5, NOW()),
-('2공장', 23.8, NOW());
-=======
----- 제품 데이터
---INSERT INTO product (name) VALUES
---('제품A'), ('제품B'), ('제품C');
---
----- 기계 데이터
---INSERT INTO machine (machine_name, location, line_id, product_id, duration) VALUES
---('기계-001', '라인1', 1, 1, 480),
---('기계-002', '라인1', 1, 1, 480),
---('기계-003', '라인2', 2, 2, 480);
-
--- 공지사항 샘플
---INSERT INTO notice (user_id, title, content, is_pinned) VALUES
---(1, '시스템 점검 안내', 'MES 시스템 정기 점검이 예정되어 있습니다.', true),
---(2, '생산 목표 달성 축하', '이번 달 생산 목표를 달성했습니다.', false);
---
----- 작업 지시서 샘플
---INSERT INTO work_order (line_id, product_id, work_order_id, user_id, qty_plan) VALUES
---(1, 1, 'WO-2025-001', 2, 1000),
---(2, 2, 'WO-2025-002', 2, 500);
---
----- 날씨 데이터 샘플
---INSERT INTO weather (location, temperature_c, humidity, recorded_at) VALUES
---('공장A', 23.5, 65.0, NOW()),
---('공장B', 24.2, 68.5, NOW());
---
----- 공장 온도 데이터 샘플
---INSERT INTO factory_temperature (factory_name, internal_temperature, recorded_at) VALUES
---('1공장', 22.5, NOW()),
---('2공장', 23.8, NOW());
+INSERT IGNORE INTO users (username, email, password, role, department, is_active) VALUES
+('admin', 'admin@mes.com', '$2a$10$9tgX3CnemVwFZ.VuBfBMq.pFdule/.1K3tdgS5p6S5m.6nu9PKq/C', 'ADMIN', 'IT', true);

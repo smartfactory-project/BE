@@ -23,59 +23,64 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+        @Autowired
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors().and()
-            .csrf().disable()
-            .authorizeHttpRequests(authz -> authz
-                    .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
-                    .requestMatchers(HttpMethod.GET, "/api/posts/*/bookmark").permitAll()
-                    .requestMatchers(HttpMethod.PUT, "/api/posts/*/bookmark").authenticated()
-                    .requestMatchers(HttpMethod.DELETE, "/api/posts/*/bookmark").authenticated()
-                    .requestMatchers(HttpMethod.GET, "/api/posts/*/like").permitAll()
-                    .requestMatchers(HttpMethod.PUT, "/api/posts/*/like").authenticated()
-                    .requestMatchers(HttpMethod.DELETE, "/api/posts/*/like").authenticated()
-                    .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/posts/*/comments").authenticated()
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/posts/*/view").permitAll()
-                    .requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/public/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/posts", "/api/posts/*", "/api/posts/**").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                                .cors().and()
+                                .csrf().disable()
+                                .authorizeHttpRequests(authz -> authz
+                                                .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
+                                                .requestMatchers(HttpMethod.GET, "/api/posts/*/bookmark").permitAll()
+                                                .requestMatchers(HttpMethod.PUT, "/api/posts/*/bookmark")
+                                                .authenticated()
+                                                .requestMatchers(HttpMethod.DELETE, "/api/posts/*/bookmark")
+                                                .authenticated()
+                                                .requestMatchers(HttpMethod.GET, "/api/posts/*/like").permitAll()
+                                                .requestMatchers(HttpMethod.PUT, "/api/posts/*/like").authenticated()
+                                                .requestMatchers(HttpMethod.DELETE, "/api/posts/*/like").authenticated()
+                                                .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/posts/*/comments")
+                                                .authenticated()
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/posts/*/view").permitAll()
+                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/api/public/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/posts", "/api/posts/*",
+                                                                "/api/posts/**")
+                                                .permitAll()
+                                                .requestMatchers("/api/schedules/**").authenticated()
+                                                .anyRequest().authenticated())
+                                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                                .and()
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+                return authConfig.getAuthenticationManager();
+        }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(Arrays.asList("*"));
+                configuration.setAllowCredentials(true);
+                configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 }
