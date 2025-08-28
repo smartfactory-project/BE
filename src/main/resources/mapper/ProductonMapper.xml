@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.ProductionMapper">
+
+    <!-- 월별 생산량 추이 -->
+    <select id="getMonthlyProduction" resultType="com.example.demo.model.Production">
+        SELECT
+            MONTH(w.created_at) AS month,
+            SUM(IFNULL(p.actual_qty, 0)) AS production,
+            SUM(w.qty_plan) AS target
+        FROM work_order w
+        LEFT JOIN (
+        SELECT
+        work_order_id,
+        SUM(good_qty + defect_qty) AS actual_qty
+        FROM production_data
+        GROUP BY work_order_id
+        ) p ON p.work_order_id = w.work_order_id
+        GROUP BY month
+        ORDER BY month
+    </select>
+
+    <select id="getMonthlyLine" resultType="com.example.demo.model.LineMonth">
+        SELECT
+        Month(w.created_at) AS month,
+
+        SUM(CASE WHEN w.line_id = 1 THEN IFNULL(p.actual_qty,0) ELSE 0 END) AS lineA,
+        SUM(CASE WHEN w.line_id = 2 THEN IFNULL(p.actual_qty,0) ELSE 0 END) AS lineB,
+        SUM(CASE WHEN w.line_id = 3 THEN IFNULL(p.actual_qty,0) ELSE 0 END) AS lineC,
+        SUM(CASE WHEN w.line_id = 4 THEN IFNULL(p.actual_qty,0) ELSE 0 END) AS lineD,
+        SUM(CASE WHEN w.line_id = 5 THEN IFNULL(p.actual_qty,0) ELSE 0 END) AS lineE
+
+        FROM work_order w
+        LEFT JOIN (
+        SELECT work_order_id, SUM(good_qty + defect_qty) AS actual_qty
+        FROM production_data
+        GROUP BY work_order_id
+        ) p ON p.work_order_id = w.work_order_id
+
+        GROUP BY month
+        ORDER BY month;
+
+    </select>
+
+    <select id="performanceMonthly" resultType="com.example.demo.model.Performance">
+        SELECT
+        month(pd.created_at) AS month,        -- 월
+        SUM(pd.good_qty + pd.defect_qty) AS output,    -- 총 생산량 (양품 + 불량)
+        ROUND(SUM(pd.good_qty + pd.defect_qty) / 6000 * 100, 2) AS efficiency  -- 효율성(%)
+        /*(pd.good_qty) AS total_good,                          -- 양품 수량
+        SUM(pd.defect_qty) AS total_defect,                      -- 불량 수량
+        ROUND(SUM(pd.good_qty) / (SUM(pd.good_qty) + SUM(pd.defect_qty)) * 100, 2) AS quality_rate -- 품질률(%)*/
+        FROM production_data pd
+        GROUP BY month
+        ORDER BY month;
+
+    </select>
+
+
+</mapper>
