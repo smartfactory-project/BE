@@ -62,13 +62,8 @@
         p.created_at           AS createdAt,
         p.updated_at           AS updatedAt,
         u.username   AS author,
-        /* 총 좋아요 수 */
         (SELECT COUNT(*) FROM post_like pl WHERE pl.post_id = p.post_id) AS likes,
-
-        /* 총 댓글 수 (활성만 집계하고 싶으면 c.is_active = 1 조건 추가) */
         (SELECT COUNT(*) FROM comment c WHERE c.post_id = p.post_id) AS comments,
-
-        /* 내가 좋아요 했는지 */
         CASE
         WHEN #{viewerId} IS NULL THEN 0
         ELSE EXISTS (
@@ -76,8 +71,6 @@
         WHERE x.post_id = p.post_id AND x.user_id = #{viewerId}
         )
         END AS liked,
-
-        /* 내가 북마크 했는지 */
         CASE
         WHEN #{viewerId} IS NULL THEN 0
         ELSE EXISTS (
@@ -93,7 +86,6 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- ✅ 단건: 집계/상태 포함 -->
     <select id="selectPostByIdWithStats" resultType="com.example.demo.dto.PostWithStatsResponse">
         SELECT
         p.post_id              AS id,
@@ -106,10 +98,8 @@
         p.created_at           AS createdAt,
         p.updated_at           AS updatedAt,
         u.username   AS author,
-
         (SELECT COUNT(*) FROM post_like pl WHERE pl.post_id = p.post_id) AS likes,
         (SELECT COUNT(*) FROM comment c   WHERE c.post_id = p.post_id)   AS comments,
-
         CASE
         WHEN #{viewerId} IS NULL THEN 0
         ELSE EXISTS (
@@ -117,7 +107,6 @@
         WHERE x.post_id = p.post_id AND x.user_id = #{viewerId}
         )
         END AS liked,
-
         CASE
         WHEN #{viewerId} IS NULL THEN 0
         ELSE EXISTS (
@@ -138,8 +127,6 @@
         WHERE post_id = #{postId}
     </update>
 
-
-    <!-- 프로필(기본정보 + 집계) -->
     <select id="selectMyProfile" resultType="com.example.demo.dto.MyPageProfileResponse">
         SELECT
         u.user_id    AS userId,
@@ -153,7 +140,6 @@
         WHERE u.user_id = #{userId}
     </select>
 
-    <!-- 공통 select 컬럼 묶음 -->
     <sql id="postWithStatsColumns">
         p.post_id          AS id,
         p.user_id          AS userId,
@@ -171,7 +157,6 @@
         CASE WHEN vpb.user_id IS NULL THEN 0 ELSE 1 END AS bookmarked
     </sql>
 
-    <!-- 내가 쓴 글 -->
     <select id="selectPostsByAuthorWithStats" resultType="com.example.demo.dto.PostWithStatsResponse">
         SELECT
         <include refid="postWithStatsColumns"/>
@@ -186,7 +171,6 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- 내가 좋아요한 글 -->
     <select id="selectPostsLikedByUserWithStats" resultType="com.example.demo.dto.PostWithStatsResponse">
         SELECT
         <include refid="postWithStatsColumns"/>
@@ -202,7 +186,6 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- 내가 스크랩한 글 -->
     <select id="selectPostsBookmarkedByUserWithStats" resultType="com.example.demo.dto.PostWithStatsResponse">
         SELECT
         <include refid="postWithStatsColumns"/>
@@ -218,16 +201,15 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- 작성자 찾기 -->
     <select id="findAuthorIdByPostId" parameterType="int" resultType="int">
         SELECT user_id
         FROM post
         WHERE post_id = #{postId}
     </select>
 
-    <!-- 물리 삭제 (FK가 ON DELETE CASCADE일 때) -->
     <delete id="deletePost" parameterType="int">
         DELETE FROM post
         WHERE post_id = #{postId}
     </delete>
+
 </mapper>
