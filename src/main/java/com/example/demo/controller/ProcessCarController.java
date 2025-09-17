@@ -17,15 +17,12 @@ public class ProcessCarController {
         this.carNameService = carNameService;
     }
 
-    /** 전체 차량 리스트 */
+    /**
+     * factory_id로 해당 공장의 차량 목록 조회
+     * 예: GET /process/routings/car?factoryId=1
+     */
     @GetMapping
-    public ResponseEntity<List<CarNameResponse>> getAll() {
-        return ResponseEntity.ok(carNameService.getAll());
-    }
-
-    /** 단일 차량 조회 (옵션: 유지) */
-    @GetMapping("/{carName}")
-    public ResponseEntity<CarNameResponse> getByCarName(@PathVariable String carName) {
-        return ResponseEntity.ok(carNameService.getByCarName(carName));
+    public ResponseEntity<List<CarNameResponse>> getByFactory(@RequestParam("factoryId") int factoryId) {
+        return ResponseEntity.ok(carNameService.getByFactoryId(factoryId));
     }
 }

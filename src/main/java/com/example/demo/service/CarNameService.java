@@ -17,20 +17,12 @@ public class CarNameService {
         this.carNameMapper = carNameMapper;
     }
 
-    public List<CarNameResponse> getAll() {
-        List<CarName> rows = carNameMapper.selectAll();
+    public List<CarNameResponse> getByFactoryId(int factoryId) {
+        List<CarName> rows = carNameMapper.selectByFactoryId(factoryId);
         List<CarNameResponse> list = new ArrayList<>();
         for (CarName r : rows) {
             list.add(new CarNameResponse(r.getCarId(), r.getCarName(), r.getImageUrl()));
         }
         return list;
-    }
-
-    public CarNameResponse getByCarName(String carName) {
-        CarName row = carNameMapper.selectByCarName(carName);
-        if (row == null) {
-            throw new IllegalArgumentException("Unknown car_name: " + carName);
-        }
-        return new CarNameResponse(row.getCarId(), row.getCarName(), row.getImageUrl());
     }
 }

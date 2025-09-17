@@ -250,3 +250,5 @@ CREATE TABLE IF NOT EXISTS monitoring_factory (
 -- 관리자 계정 (비밀번호: admin123)
 INSERT IGNORE INTO users (username, email, password, role, department, is_active) VALUES
 ('admin', 'admin@mes.com', '$2a$10$9tgX3CnemVwFZ.VuBfBMq.pFdule/.1K3tdgS5p6S5m.6nu9PKq/C', 'ADMIN', 'IT', true);
+
+

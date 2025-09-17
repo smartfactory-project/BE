@@ -8,6 +8,5 @@ import java.util.List;
 
 @Mapper
 public interface CarNameMapper {
-    CarName selectByCarName(@Param("carName") String carName);
-    List<CarName> selectAll();
+    List<CarName> selectByFactoryId(@Param("factoryId") int factoryId);
 }

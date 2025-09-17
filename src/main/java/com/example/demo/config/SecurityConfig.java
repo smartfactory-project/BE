@@ -61,6 +61,9 @@ public class SecurityConfig {
                                                 // 저장(치환)은 인증 필요
                                                 .requestMatchers(HttpMethod.PUT, "/process/routings/**").authenticated()
                                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car/**").permitAll()
+                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car").permitAll()
+                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations").permitAll()
+                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations/**").permitAll()
                                         .anyRequest().authenticated())
                                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                 .and()
