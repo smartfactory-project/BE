@@ -4,7 +4,7 @@
 -- 데이터베이스 생성
 CREATE DATABASE IF NOT EXISTS mes_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE mes_system;
+USE mes_car;
 
 -- 사용자 테이블 (인증 시스템용)
 CREATE TABLE IF NOT EXISTS users (

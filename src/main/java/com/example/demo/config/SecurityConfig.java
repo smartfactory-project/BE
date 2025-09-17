@@ -52,6 +52,14 @@ public class SecurityConfig {
                                                                 "/api/posts/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/schedules/**").authenticated()
+
+                                                // --- 추가: /process 라우팅 규칙 ---
+                                                // 조회는 공개
+                                                .requestMatchers(HttpMethod.GET, "/process/routings/**").permitAll()
+                                                // validate는 공개 (원하면 authenticated로 바꿔도 됨)
+                                                .requestMatchers(HttpMethod.POST, "/process/routings/*/validate").permitAll()
+                                                // 저장(치환)은 인증 필요
+                                                .requestMatchers(HttpMethod.PUT, "/process/routings/**").authenticated()
                                                 .anyRequest().authenticated())
                                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                 .and()

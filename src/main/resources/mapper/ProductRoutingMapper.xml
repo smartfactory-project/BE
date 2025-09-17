@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.ProductRoutingMapper">
+
+    <resultMap id="ProductRoutingMap" type="com.example.demo.model.ProductRouting">
+        <id     column="routing_id"   property="routingId"/>
+        <result column="line_id"      property="lineId"/>
+        <result column="product_id"   property="productId"/>
+        <result column="process_seq"  property="processSeq"/>
+        <result column="process_type" property="processType"/>
+        <result column="duration"     property="duration"/>
+    </resultMap>
+
+    <select id="selectByProductId" resultMap="ProductRoutingMap">
+        SELECT routing_id, line_id, product_id, process_seq, process_type, duration
+        FROM PRODUCT_ROUTING
+        WHERE product_id = #{productId}
+        ORDER BY process_seq ASC
+    </select>
+
+    <delete id="deleteByProductId">
+        DELETE FROM PRODUCT_ROUTING
+        WHERE product_id = #{productId}
+    </delete>
+
+    <insert id="insertNode" useGeneratedKeys="true" keyProperty="routingId">
+        INSERT INTO PRODUCT_ROUTING (line_id, product_id, process_seq, process_type, duration)
+        VALUES (#{lineId}, #{productId}, #{processSeq}, #{processType}, #{duration})
+    </insert>
+
+    <insert id="insertNodes">
+        INSERT INTO PRODUCT_ROUTING (line_id, product_id, process_seq, process_type, duration)
+        VALUES
+        <foreach collection="nodes" item="n" separator=",">
+            (#{n.lineId}, #{n.productId}, #{n.processSeq}, #{n.processType}, #{n.duration})
+        </foreach>
+    </insert>
+
+    <update id="updateNode">
+        UPDATE PRODUCT_ROUTING
+        SET line_id = #{lineId},
+        process_seq = #{processSeq},
+        process_type = #{processType},
+        duration = #{duration}
+        WHERE routing_id = #{routingId}
+    </update>
+
+    <delete id="deleteByRoutingId">
+        DELETE FROM PRODUCT_ROUTING
+        WHERE routing_id = #{routingId}
+    </delete>
+
+    <select id="countLineIdExists" resultType="int">
+        SELECT COUNT(DISTINCT line_id) FROM STATION WHERE line_id = #{lineId}
+    </select>
+
+    <select id="countProductModel" resultType="int">
+        SELECT COUNT(*) FROM PRODUCT_MODEL WHERE product_id = #{productId}
+    </select>
+</mapper>
