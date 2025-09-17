@@ -23,7 +23,6 @@ public class ProcessRoutingController {
     /** 모델별 라우팅 조회 */
     @GetMapping("/{productId}")
     public ResponseEntity<ProductRoutingGetResponse> get(@PathVariable String productId) {
-        System.out.println("here");
         return ResponseEntity.ok(service.getByProductId(productId));
     }
 

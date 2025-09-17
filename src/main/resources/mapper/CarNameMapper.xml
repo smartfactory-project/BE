@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.CarNameMapper">
+
+    <resultMap id="CarNameMap" type="com.example.demo.model.CarName">
+        <result column="car_id"    property="carId"/>
+        <result column="car_name"  property="carName"/>
+        <result column="image_url" property="imageUrl"/>
+    </resultMap>
+
+    <select id="selectByCarName" resultMap="CarNameMap">
+        SELECT car_id, car_name, image_url
+        FROM CAR_NAME
+        WHERE car_name = #{carName}
+        LIMIT 1
+    </select>
+
+    <select id="selectAll" resultMap="CarNameMap">
+        SELECT car_id, car_name, image_url
+        FROM CAR_NAME
+        ORDER BY car_name ASC
+    </select>
+
+</mapper>

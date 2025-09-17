@@ -60,7 +60,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/process/routings/*/validate").permitAll()
                                                 // 저장(치환)은 인증 필요
                                                 .requestMatchers(HttpMethod.PUT, "/process/routings/**").authenticated()
-                                                .anyRequest().authenticated())
+                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car/**").permitAll()
+                                        .anyRequest().authenticated())
                                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                 .and()
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
