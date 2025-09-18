@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.routing.mapper.ProductRoutingMapper">
+
+    <resultMap id="ProductRoutingMap" type="com.example.demo.routing.model.ProductRouting">
+        <id     column="routing_id"   property="routingId"/>
+        <result column="line_id"      property="lineId"/>
+        <result column="product_id"   property="productId"/>
+        <result column="process_seq"  property="processSeq"/>
+        <result column="process_type" property="processType"/>
+        <result column="duration"     property="duration"/>
+    </resultMap>
+
+    <select id="selectByProductId" resultMap="ProductRoutingMap">
+        SELECT routing_id, line_id, product_id, process_seq, process_type, duration
+        FROM PRODUCT_ROUTING
+        WHERE product_id = #{productId}
+        ORDER BY process_seq ASC
+    </select>
+
+</mapper>
