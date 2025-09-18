@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.post.mapper.CommentMapper">
+    <select id="selectByPostIdWithUser" parameterType="int" resultType="com.example.demo.post.dto.CommentResponse">
+        SELECT
+        c.comment_id         AS id,
+        c.post_id            AS postId,
+        c.user_id            AS userId,
+        c.parent_comment_id  AS parentCommentId,
+        c.content            AS content,
+        c.created_at         AS createdAt,
+        c.updated_at         AS updatedAt,
+        c.is_active          AS isActive,
+        u.username           AS username
+        FROM comment c
+        JOIN users u ON u.user_id = c.user_id
+        WHERE c.post_id = #{postId}
+        ORDER BY c.comment_id DESC
+    </select>
+
+    <select id="selectOneWithUser" parameterType="int" resultType="com.example.demo.post.dto.CommentResponse">
+        SELECT
+        c.comment_id         AS id,
+        c.post_id            AS postId,
+        c.user_id            AS userId,
+        c.parent_comment_id  AS parentCommentId,
+        c.content            AS content,
+        c.created_at         AS createdAt,
+        c.updated_at         AS updatedAt,
+        c.is_active          AS isActive,
+        u.username           AS username
+        FROM comment c
+        JOIN users u ON u.user_id = c.user_id
+        WHERE c.comment_id = #{commentId}
+    </select>
+
+    <resultMap id="CommentResultMap" type="com.example.demo.post.model.Comment">
+        <id     property="commentId"       column="comment_id"/>
+        <result property="postId"          column="post_id"/>
+        <result property="userId"          column="user_id"/>
+        <result property="parentCommentId" column="parent_comment_id"/>
+        <result property="content"         column="content"/>
+        <result property="createdAt"       column="created_at"/>
+        <result property="updatedAt"       column="updated_at"/>
+        <result property="isActive"        column="is_active"/>
+    </resultMap>
+
+    <select id="selectByPostId" parameterType="int" resultMap="CommentResultMap">
+        SELECT
+        comment_id, post_id, user_id, parent_comment_id, content,
+        created_at, updated_at, is_active
+        FROM comment
+        WHERE post_id = #{postId}
+        ORDER BY comment_id DESC
+    </select>
+
+    <select id="selectOne" parameterType="int" resultMap="CommentResultMap">
+        SELECT
+        comment_id, post_id, user_id, parent_comment_id, content,
+        created_at, updated_at, is_active
+        FROM comment
+        WHERE comment_id = #{commentId}
+    </select>
+
+    <select id="selectPostIdByCommentId" parameterType="int" resultType="int">
+        SELECT post_id
+        FROM comment
+        WHERE comment_id = #{commentId}
+    </select>
+
+    <insert id="insertComment"
+            parameterType="com.example.demo.post.model.Comment"
+            useGeneratedKeys="true" keyProperty="commentId">
+        INSERT INTO comment (
+        post_id, user_id, parent_comment_id, content, created_at, updated_at, is_active
+        )
+        VALUES (
+        #{postId}, #{userId}, #{parentCommentId}, #{content}, NOW(), NOW(), 1
+        )
+    </insert>
+
+</mapper>
