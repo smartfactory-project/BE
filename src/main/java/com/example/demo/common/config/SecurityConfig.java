@@ -30,6 +30,7 @@ public class SecurityConfig {
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
                                 .cors().and()
+
                                 .csrf().disable()
                                 .authorizeHttpRequests(authz -> authz
                                                 // --- Error API 모든 메서드 허용 (맨 위에 배치) ---
@@ -63,6 +64,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/process/routings/*/validate").permitAll()
                                                 // 저장(치환)은 인증 필요
                                                 .requestMatchers(HttpMethod.PUT, "/process/routings/**").authenticated()
+                                        .requestMatchers(HttpMethod.GET, "/api/position/stream").permitAll() // ★ 임시 개방
+
                                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car/**").permitAll()
                                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car").permitAll()
                                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations").permitAll()
