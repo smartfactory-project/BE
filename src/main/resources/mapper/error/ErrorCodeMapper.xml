@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.error.mapper.ErrorCodeMapper">
+
+    <!-- ResultMap 정의 -->
+    <resultMap id="ErrorCodeResultMap" type="com.example.demo.error.model.ErrorCode">
+        <id property="errorCode" column="error_code"/>
+        <result property="errorName" column="error_name"/>
+        <result property="errorDesc" column="error_desc"/>
+        <result property="errorCategory" column="error_category"/>
+        <result property="processType" column="process_type"/>
+        <result property="defaultSeverity" column="default_severity"/>
+        <result property="autoRecovery" column="auto_recovery"/>
+        <result property="solutionGuide" column="solution_guide"/>
+        <result property="thresholdValue" column="threshold_value"/>
+        <result property="unit" column="unit"/>
+        <result property="isActive" column="is_active"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 공통 컬럼 정의 -->
+    <sql id="errorCodeColumns">
+        error_code, error_name, error_desc, error_category, process_type,
+        default_severity, auto_recovery, solution_guide, threshold_value,
+        unit, is_active, created_at, updated_at
+    </sql>
+
+    <!-- 전체 조회 -->
+    <select id="selectAll" resultMap="ErrorCodeResultMap">
+        SELECT <include refid="errorCodeColumns"/>
+        FROM ERROR_CODE_MASTER
+        ORDER BY process_type, error_code
+    </select>
+
+    <!-- 공정 타입별 조회 -->
+    <select id="selectByProcessType" resultMap="ErrorCodeResultMap">
+        SELECT <include refid="errorCodeColumns"/>
+        FROM ERROR_CODE_MASTER
+        WHERE process_type = #{processType}
+        ORDER BY error_code
+    </select>
+
+    <!-- 카테고리별 조회 -->
+    <select id="selectByCategory" resultMap="ErrorCodeResultMap">
+        SELECT <include refid="errorCodeColumns"/>
+        FROM ERROR_CODE_MASTER
+        WHERE error_category = #{category}
+        ORDER BY process_type, error_code
+    </select>
+
+    <!-- 활성화된 것만 조회 -->
+    <select id="selectActiveOnly" resultMap="ErrorCodeResultMap">
+        SELECT <include refid="errorCodeColumns"/>
+        FROM ERROR_CODE_MASTER
+        WHERE is_active = true
+        ORDER BY process_type, error_code
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="selectByCode" resultMap="ErrorCodeResultMap">
+        SELECT <include refid="errorCodeColumns"/>
+        FROM ERROR_CODE_MASTER
+        WHERE error_code = #{errorCode}
+    </select>
+
+    <!-- 생성 -->
+    <insert id="insert" parameterType="com.example.demo.error.model.ErrorCode">
+        INSERT INTO ERROR_CODE_MASTER (
+            error_code, error_name, error_desc, error_category, process_type,
+            default_severity, auto_recovery, solution_guide, threshold_value,
+            unit, is_active, created_at, updated_at
+        ) VALUES (
+            #{errorCode}, #{errorName}, #{errorDesc}, #{errorCategory}, #{processType},
+            #{defaultSeverity}, #{autoRecovery}, #{solutionGuide}, #{thresholdValue},
+            #{unit}, #{isActive}, NOW(), NOW()
+        )
+    </insert>
+
+    <!-- 수정 -->
+    <update id="update" parameterType="com.example.demo.error.model.ErrorCode">
+        UPDATE ERROR_CODE_MASTER SET
+            error_name = #{errorName},
+            error_desc = #{errorDesc},
+            error_category = #{errorCategory},
+            process_type = #{processType},
+            default_severity = #{defaultSeverity},
+            auto_recovery = #{autoRecovery},
+            solution_guide = #{solutionGuide},
+            threshold_value = #{thresholdValue},
+            unit = #{unit},
+            is_active = #{isActive},
+            updated_at = NOW()
+        WHERE error_code = #{errorCode}
+    </update>
+
+    <!-- 삭제 (물리 삭제) -->
+    <delete id="delete">
+        DELETE FROM ERROR_CODE_MASTER
+        WHERE error_code = #{errorCode}
+    </delete>
+
+    <!-- 비활성화 (논리 삭제) -->
+    <update id="deactivate">
+        UPDATE ERROR_CODE_MASTER SET
+            is_active = false,
+            updated_at = NOW()
+        WHERE error_code = #{errorCode}
+    </update>
+
+    <!-- 활성화 -->
+    <update id="activate">
+        UPDATE ERROR_CODE_MASTER SET
+            is_active = true,
+            updated_at = NOW()
+        WHERE error_code = #{errorCode}
+    </update>
+
+    <!-- 존재 여부 확인 -->
+    <select id="existsByCode" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM ERROR_CODE_MASTER
+        WHERE error_code = #{errorCode}
+    </select>
+
+    <!-- 전체 카운트 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM ERROR_CODE_MASTER
+    </select>
+
+    <!-- 공정 타입별 카운트 -->
+    <select id="countByProcessType" resultType="int">
+        SELECT COUNT(*)
+        FROM ERROR_CODE_MASTER
+        WHERE process_type = #{processType}
+    </select>
+
+</mapper>

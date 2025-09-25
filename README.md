@@ -1,23 +1,5 @@
-## 기능
 
-### 인증 시스템
-- JWT 기반 로그인/회원가입
-- 보안 설정 및 권한 관리
-
-### 커뮤니티 기능
-- 게시글 CRUD
-- 댓글 시스템
-- 좋아요/북마크 기능
-
-### 일정 관리
-- 스케줄 관리
-- 작업(Task) 관리
-
-### 생산 관리 및 분석
-- 생산 데이터 관리
-- 품질 차트 및 분석
-- 성능 지표 모니터링
-
+```
 BE
 ├─ .mvn
 │  └─ wrapper
@@ -25,7 +7,6 @@ BE
 ├─ mvnw
 ├─ mvnw.cmd
 ├─ pom.xml
-├─ README.md
 └─ src
    └─ main
       ├─ java
@@ -59,6 +40,19 @@ BE
       │           │     ├─ ForbiddenException.java
       │           │     └─ NotFoundException.java
       │           ├─ DemoApplication.java
+      │           ├─ error
+      │           │  ├─ controller
+      │           │  │  └─ ErrorCodeController.java
+      │           │  ├─ dto
+      │           │  │  ├─ ErrorCodeCreateRequest.java
+      │           │  │  ├─ ErrorCodeResponse.java
+      │           │  │  └─ ErrorCodeUpdateRequest.java
+      │           │  ├─ mapper
+      │           │  │  └─ ErrorCodeMapper.java
+      │           │  ├─ model
+      │           │  │  └─ ErrorCode.java
+      │           │  └─ service
+      │           │     └─ ErrorCodeService.java
       │           ├─ post
       │           │  ├─ controller
       │           │  │  ├─ CommentController.java
@@ -146,6 +140,8 @@ BE
       │                 └─ ScheduleService.java
       └─ resources
          ├─ application.properties
+         ├─ data.sql
+         ├─ data2.sql
          ├─ mapper
          │  ├─ auth
          │  │  └─ UserMapper.xml
@@ -164,6 +160,7 @@ BE
          │  │  └─ StationMapper.xml
          │  └─ schedule
          │     └─ ScheduleMapper.xml
-         └─ schema.sql
+         ├─ schema1.sql
+         └─ schema2.sql
 
 ```

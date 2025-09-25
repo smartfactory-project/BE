@@ -33,6 +33,9 @@ public class SecurityConfig {
 
                                 .csrf().disable()
                                 .authorizeHttpRequests(authz -> authz
+                                                // --- Error API 모든 메서드 허용 (맨 위에 배치) ---
+                                                .requestMatchers("/api/error-codes/**").permitAll()
+                                                
                                                 .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
                                                 .requestMatchers(HttpMethod.GET, "/api/posts/*/bookmark").permitAll()
                                                 .requestMatchers(HttpMethod.PUT, "/api/posts/*/bookmark")
@@ -67,6 +70,7 @@ public class SecurityConfig {
                                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car").permitAll()
                                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations").permitAll()
                                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations/**").permitAll()
+                                        
                                         .anyRequest().authenticated())
                                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                 .and()
