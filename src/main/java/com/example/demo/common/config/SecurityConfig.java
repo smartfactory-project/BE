@@ -56,7 +56,7 @@ public class SecurityConfig {
                                                                 "/api/posts/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/schedules/**").authenticated()
-
+                                                
                                                 .requestMatchers(HttpMethod.POST, "/statistics/upload").permitAll()
 
                                                 // --- 추가: /process 라우팅 규칙 ---
