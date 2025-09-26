@@ -13,5 +13,8 @@ public interface ProductionMapper {
 
     List<LineMonth> getMonthlyLine();
 
-        List<Performance> performanceMonthly();
+    List<Performance> performanceMonthly();
+
+    // simulation_name, exists 전체 조회
+    List<com.example.demo.quality.model.SimulationRow> getAllSimulationData();
 }

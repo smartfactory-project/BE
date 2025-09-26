@@ -35,7 +35,11 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(authz -> authz
                                                 // --- Error API 모든 메서드 허용 (맨 위에 배치) ---
                                                 .requestMatchers("/api/error-codes/**").permitAll()
-                                                
+
+
+                                                // --- Production API 모든 메서드 허용 ---
+                                                .requestMatchers("/api/production/**").permitAll()
+
                                                 .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
                                                 .requestMatchers(HttpMethod.GET, "/api/posts/*/bookmark").permitAll()
                                                 .requestMatchers(HttpMethod.PUT, "/api/posts/*/bookmark")
@@ -56,26 +60,26 @@ public class SecurityConfig {
                                                                 "/api/posts/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/schedules/**").authenticated()
-                                                
+
                                                 .requestMatchers(HttpMethod.POST, "/statistics/upload").permitAll()
 
                                                 // --- 추가: /process 라우팅 규칙 ---
-                                                                .requestMatchers(HttpMethod.GET, "/api/statistics/**").permitAll()
-                                                                .requestMatchers(HttpMethod.POST, "/api/statistics/**").permitAll()
-                                                                .requestMatchers(HttpMethod.OPTIONS, "/api/statistics/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/statistics/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/statistics/**").permitAll()
+                                                .requestMatchers(HttpMethod.OPTIONS, "/api/statistics/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/process/routings/**").permitAll()
                                                 // validate는 공개 (원하면 authenticated로 바꿔도 됨)
                                                 .requestMatchers(HttpMethod.POST, "/process/routings/*/validate").permitAll()
                                                 // 저장(치환)은 인증 필요
                                                 .requestMatchers(HttpMethod.PUT, "/process/routings/**").authenticated()
-                                        .requestMatchers(HttpMethod.GET, "/api/position/stream").permitAll() // ★ 임시 개방
+                                                .requestMatchers(HttpMethod.GET, "/api/position/stream").permitAll() // ★ 임시 개방
 
-                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car/**").permitAll()
-                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car").permitAll()
-                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations").permitAll()
-                                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations/**").permitAll()
-                                        
-                                        .anyRequest().authenticated())
+                                                .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car/**").permitAll()
+                                                .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/car").permitAll()
+                                                .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations").permitAll()
+                                                .requestMatchers(org.springframework.http.HttpMethod.GET, "/process/routings/stations/**").permitAll()
+
+                                                .anyRequest().authenticated())
                                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                 .and()
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -24,7 +24,16 @@ public class MqttPositionSubscriber implements MqttCallback {
 
     @PostConstruct
     public void start() {
-        connectAndSubscribe();
+        // MQTT 연결 재시도를 별도의 스레드에서 실행
+        Thread mqttThread = new Thread(() -> {
+            try {
+                connectAndSubscribe();
+            } catch (Exception e) {
+                System.err.println("[MQTT] 초기 연결 실패: " + e.getMessage());
+            }
+        }, "mqtt-subscriber-thread");
+        mqttThread.setDaemon(true); // 백그라운드 스레드
+        mqttThread.start();
     }
 
     private void connectAndSubscribe() {

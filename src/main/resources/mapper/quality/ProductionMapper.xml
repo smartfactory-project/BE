@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.quality.mapper.ProductionMapper">
+    <!-- simulation_name, exists 전체 조회 -->
+    <select id="getAllSimulationData" resultType="com.example.demo.quality.model.SimulationRow">
+        SELECT simulation_name AS simulationName, exists
+        FROM statistics_report
+        WHERE simulation_name IN ('press1','press2','press3','press4','press5','body1','body2','body3','body4','body5','paint1','paint2','paint3','paint4','paint5')
+    </select>
 
     <!-- 월별 생산량 추이 -->
     <select id="getMonthlyProduction" resultType="com.example.demo.quality.model.Production">

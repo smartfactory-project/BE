@@ -1,6 +1,14 @@
 -- 안전하게 초기화 (FK 의존 무시)
 SET FOREIGN_KEY_CHECKS = 0;
 
+CREATE TABLE station_sensor_values (
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,  -- 내부 식별자
+    tag       VARCHAR(64) NOT NULL,               -- 센서 이름
+    value     DECIMAL(12,3) NOT NULL,             -- 측정값
+    datetime  DATETIME(3) NOT NULL,               -- 수집 시각 (밀리초 단위까지)
+    KEY idx_tag_time (tag, datetime)
+);
+
 -- 2) 테이블 생성 (참조되는 테이블 먼저)
 CREATE TABLE FACTORY (
   facId      INT NOT NULL,
